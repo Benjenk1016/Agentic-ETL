@@ -1,0 +1,54 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: agentic-etl-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend/public/index.html:/usr/share/nginx/html/index.html:ro
+      - ./frontend/public/setup.html:/usr/share/nginx/html/setup.html:ro
+      - ./frontend/assets/css/styles.css:/usr/share/nginx/html/assets/css/styles.css:ro
+      - ./frontend/assets/js/chat_intake.js:/usr/share/nginx/html/assets/js/chat_intake.js:ro
+      - ./frontend/public/images:/usr/share/nginx/html/images:ro
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: agentic-etl-api
+    ports:
+      - "5001:5000"
+    environment:
+      - INPUT_DIR=/data/input
+      - OUTPUT_DIR=/data/output
+      - STATE_DIR=/data/state
+      - HASH_DIR=/data/state/hashes
+      - ARCHIVE_DIR=/data/archive
+      - ONEDRIVE_DOWNLOAD_DIR=/data/input
+      - ONEDRIVE_MANIFEST=/data/state/onedrive_manifest.xlsx
+      - ONEDRIVE_TOKEN_CACHE=/data/state/token_cache.bin
+      - STATE_FILE=/data/state/google_seen.json
+      - BACKUP_DIR=/data/GoogleSheetsBackups
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/run/secrets/google_service_account.json
+      # Ollama configuration - runs locally on your machine
+      - OLLAMA_MODEL_NAME=${OLLAMA_MODEL_NAME:-qwen2.5:3b}
+      - OLLAMA_API_URL=${OLLAMA_API_URL:-http://host.docker.internal:11434/api/generate}
+    env_file:
+      - .env
+    volumes:
+      - ./data/input:/data/input
+      - ./data/config:/data/config
+      - ./data/responses:/data/responses
+      - ./data/output:/data/output
+      - ./data/state:/data/state
+      - ./data/archive:/data/archive
+      - ./backend:/app/backend
+      - ./secrets/riverrockadvisors-api-key.json:/run/secrets/google_service_account.json:ro
+      - ${ONEDRIVE_BACKUP_DIR}:/data/GoogleSheetsBackups
+    restart: unless-stopped
+
+  # Ollama removed - run locally on your machine instead
+

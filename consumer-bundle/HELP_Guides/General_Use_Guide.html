@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic ETL General Use</title>
+<style>
+	:root {
+		--page-bg: #eef3f7;
+		--panel-bg: #ffffff;
+		--hero-bg: linear-gradient(180deg, #1b4d7a 0%, #2d6cdf 100%);
+		--text-main: #17324d;
+		--text-muted: #5b7288;
+		--border: #d5e0ea;
+		--accent: #2d6cdf;
+		--accent-dark: #173f86;
+		--success-bg: #ecf7f0;
+		--success-text: #1f6a3d;
+		--warning-bg: #fff6e5;
+		--warning-text: #875d08;
+		--code-bg: #10253a;
+		--shadow: 0 18px 45px rgba(17, 59, 99, 0.12);
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		margin: 0;
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+		background: linear-gradient(180deg, #f7fafc 0%, var(--page-bg) 100%);
+		color: var(--text-main);
+		line-height: 1.7;
+		font-size: 19px;
+	}
+
+	a {
+		color: var(--accent-dark);
+	}
+
+	.page {
+		max-width: 980px;
+		margin: 0 auto;
+		padding: 28px 20px 56px;
+	}
+
+	.hero {
+		background: var(--hero-bg);
+		color: #ffffff;
+		border-radius: 24px;
+		padding: 36px;
+		box-shadow: var(--shadow);
+	}
+
+	.hero h1 {
+		margin: 0 0 12px;
+		font-size: clamp(2.2rem, 4vw, 3.2rem);
+		line-height: 1.1;
+	}
+
+	.hero p {
+		max-width: 780px;
+		margin: 0;
+		font-size: 1.15rem;
+	}
+
+	.hero-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 20px;
+	}
+
+	.badge {
+		padding: 10px 16px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.18);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		font-size: 1rem;
+	}
+
+	.layout {
+		display: block;
+		margin-top: 28px;
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.panel {
+		background: var(--panel-bg);
+		border: 1px solid var(--border);
+		border-radius: 22px;
+		padding: 28px;
+		box-shadow: 0 10px 28px rgba(23, 50, 77, 0.08);
+	}
+
+	.panel h2,
+	.panel h3 {
+		margin-top: 0;
+	}
+
+	.kickoff-list,
+	.step-list,
+	.check-list {
+		margin: 0;
+		padding-left: 26px;
+	}
+
+	.step-list li,
+	.check-list li,
+	.kickoff-list li {
+		margin-bottom: 12px;
+	}
+
+	.note,
+	.tip {
+		border-radius: 16px;
+		padding: 16px 18px;
+		margin-top: 16px;
+	}
+
+	.note {
+		background: var(--warning-bg);
+		color: var(--warning-text);
+	}
+
+	.tip {
+		background: var(--success-bg);
+		color: var(--success-text);
+	}
+
+	.code-block {
+		background: var(--code-bg);
+		color: #f1f6fb;
+		border-radius: 16px;
+		padding: 18px;
+		overflow-x: auto;
+		font-family: Consolas, "Courier New", monospace;
+		font-size: 1rem;
+		white-space: pre-wrap;
+	}
+
+	.step-card {
+		border: 1px solid var(--border);
+		border-radius: 18px;
+		padding: 24px;
+		background: #ffffff;
+	}
+
+	.step-label {
+		display: inline-block;
+		padding: 8px 12px;
+		border-radius: 999px;
+		background: #e6efff;
+		color: var(--accent-dark);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		margin-bottom: 10px;
+	}
+
+	.screenshot-slot {
+		margin-top: 18px;
+		border: 2px dashed #9db7d2;
+		border-radius: 18px;
+		padding: 18px;
+		background: #f7fbff;
+	}
+
+	.screenshot-slot p {
+		margin: 0;
+	}
+
+	.screenshot-slot strong {
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.screenshot-link {
+		display: inline-block;
+		margin-top: 8px;
+		padding: 10px 14px;
+		border-radius: 12px;
+		background: #ffffff;
+		border: 1px solid var(--border);
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.intro-list {
+		margin: 0;
+		padding-left: 26px;
+	}
+
+	.intro-list li {
+		margin-bottom: 12px;
+	}
+
+	.footer-note {
+		font-size: 1rem;
+		color: var(--text-muted);
+		margin-top: 10px;
+	}
+
+	@media (max-width: 900px) {
+		.hero {
+			padding: 32px 24px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.page {
+			padding: 20px 14px 44px;
+		}
+
+		.panel,
+		.step-card {
+			padding: 18px;
+		}
+
+		body {
+			font-size: 18px;
+		}
+	}
+</style>
+</head>
+<body>
+	<div class="page">
+		<section class="hero">
+			<h1>Agentic ETL General Use</h1>
+			<p>
+				This guide is for a new user using either the live website or a locally run version of the site.
+			</p>
+			<div class="hero-badges">
+				<div class="badge">For first-time users</div>
+			</div>
+		</section>
+
+		<div class="layout">
+			<main class="content">
+				<section class="panel">
+					
+					<div class="note">
+						<strong>Local use:</strong> You will need Docker Desktop and Ollama installed, and both need to be open in the background before starting the app.
+					</div>
+				</section>
+
+				<section class="panel">
+					<h2>Things to check</h2>
+					<ul class="intro-list">
+						<li>Supported browser such as Chrome, Edge, or Safari.</li>
+						<li>The Excel or CSV files you want to upload, if your workflow includes file uploads.</li>
+						<li>You have completed the <a href="Agentic_ETL_Setup_Guide.html" target="_blank">Initial Setup Guide</a>.</li>
+					</ul>
+				</section>
+
+				<section class="panel">
+					<h2>Local setup</h2>
+					<div class="step-card">
+						<div class="step-label">Step 1</div>
+						<h3>Make sure Docker Desktop and Ollama are ready</h3>
+						<ol class="step-list">
+							<li>Open Docker Desktop and make sure it is running.</li>
+							<li>Open Ollama and leave it running in the background.</li>
+						</ol>
+					</div>
+					
+				</br>
+					<div class="step-card">
+						<div class="step-label">Step 2</div>
+						<h3>Start the local app</h3>
+						<ol class="step-list">
+							<li>If <em>NO</em> consumer-bundle folder exists, open your project folder and run <strong>docker compose -f config/docker-compose.yml --env-file config/.env up</strong> in the terminal.</li>
+							<li>Find the <strong>consumer bundle</strong> folder. And double-click the <strong>start_my_app.bat</strong> file.</li>
+						</ol>
+					</div>
+				</br>
+
+					<div class="step-card">
+						<div class="step-label">Step 3</div>
+						<h3>Open the local website</h3>
+						<ol class="step-list">
+							<li>The <strong>start_my_app.bat</strong> file will open your browser automatically.</li>
+							<li>This may take a few seconds while the system finishes starting.</li>
+							<li>If the browser does not open, type this address into your browser:</li>
+						</ol>
+						<div class="code-block">http://localhost:8080</div>
+						<ol class="step-list" start="4">
+							<li>Wait for the page titled <strong>Agentic ETL Chat</strong> to load.</li>
+							<li>If the page looks incomplete, refresh the browser.</li>
+						</ol>
+					</div>
+				</br>
+					<div class="step-card">
+						<div class="step-label">Step 4</div>
+						<h3>Using the App</h3>
+						<ol class="step-list">
+							<li>Type <strong>help</strong> to view the available commands.</li>
+							<li>Press Enter to see the list of available commands.</li>
+							<li>Type the commands you'd like to execute and press Enter.</li>
+							<li>If a command is not working, inform your admin if applicable.</li>
+						</ol>
+					</div>
+				</br>
+					<div class="step-card">
+						<div class="step-label">Step 5</div>
+						<h3>Done using the App?</h3>
+						<ol class="step-list">
+							<li>Open the <strong>consumer bundle</strong> folder.</li>
+							<li>Locate <strong>stop_my_app.bat</strong>.</li>
+							<li>Double click <strong>stop_my_app.bat</strong> to stop the program.</li>
+							<li>Wait for the prompt window to say its ok to close the window or press any key to continue.</li>
+						</ol>
+					</div>
+				</section>
+
+				<section class="panel">
+					<h2>Most common commands</h2>
+					<div class="code-block">help : Display available commands
+=== MAIN WORKFLOWS ===
+1. run file processing - Detect changes in input folder & prepare files for LLM analysis.
+2. run file sync - Google Drive -> OneDrive -> project input. 
+3. process responses - Process pending LLM responses in data/responses.
+4. input - Upload a file into project input (or place files manually in data/input).
+
+=== TOOL SETUP ===
+5. authenticate onedrive - Start/continue browser-based OneDrive auth
+6. complete onedrive auth - Explicitly complete auth after browser sign-in.
+</div>
+					<div class="tip">
+					
+					<h3>If you are unsure which commands to run, the ideal workflow is as follows : </h3>
+					<ol class="step-list">
+						<li><strong>file sync</strong> : to get all your files from Google Drive and OneDrive into the project input folder.</li>
+						<li><strong>input</strong> : to upload a file into the project input folder if not on a cloud service (local only).</li>
+						<li><strong>run file processing</strong> : to detect changes in the input folder and use AI to process the files. then update config</li>
+					</ol>
+					</div>
+				</section>
+
+				<section class="panel">
+					<h2>When to contact your admin or project contact</h2>
+					<ul class="check-list">
+						<li>You see an error message during a sync or upload.</li>
+						<li>You are not sure which file should be uploaded first.</li>
+						<li>You are missing access to the correct Google Drive or OneDrive location.</li>
+						<li>The local site does not open after starting the app.</li>
+						<li>Docker Desktop or Ollama is not running correctly.</li>
+					</ul>
+				</section>
+
+				
+					</ul>
+				</section>
+			</main>
+		</div>
+	</div>
+</body>
+</html>

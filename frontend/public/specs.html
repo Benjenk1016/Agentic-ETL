@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic ETL Specifications</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --text: #1d2a39;
+      --muted: #4d6077;
+      --border: #d9e1ec;
+      --accent: #0d4f9a;
+      --code-bg: #eef4ff;
+      --shadow: 0 10px 24px rgba(16, 45, 83, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #f9fbfd 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f4a8a 0%, #1d73d4 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+    }
+
+    .hero p { margin: 0; }
+
+    .panel {
+      margin-top: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h2, h3, h4 { color: #113b70; }
+    h2 { margin-top: 0; }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid #d6e4ff;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.94em;
+    }
+
+    .toc ul,
+    .panel ul,
+    .panel ol {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    .muted { color: var(--muted); }
+
+    .diagram-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .mermaid {
+      background: #fbfdff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 720px) {
+      .wrap { padding: 14px; }
+      .panel { padding: 14px; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Agentic ETL Specifications</h1>
+      <p>This page outlines the technical specifications for the Agentic ETL system. </p>
+    </section>
+
+    <section class="panel toc">
+      <h2>What This Covers</h2>
+      <ol>
+        <li>What each chat command does</li>
+        <li>The workflow behind each command (function calls + data passed)</li>
+        <li>The ideal consumer workflow from Google Drive to OneDrive to local input to AI mapping to config updates</li>
+        <li>A data-flow diagram with explanations</li>
+      </ol>
+    </section>
+
+    <hr />
+
+    <section class="panel">
+      <h2>1) Chat Commands: What Each One Does</h2>
+      <p class="muted">These commands are parsed in the frontend chat handler (<code>frontend/assets/js/chat_intake.js</code>) and routed to backend FastAPI endpoints, which call Python modules in <code>backend/src</code>. The backend and frontend communicate via HTTP API calls.</p>
+
+      <h3>Main workflows</h3>
+      <ol>
+        <li>
+          <strong><code>run file processing</code> (shortcut: <code>1</code>)</strong>
+          <ul>
+            <li>What it does: Scans files in <code>data/input</code>, detects changed/new files (using hashes and baselines), prepares changed files for analysis, and writes a changed-files manifest. Triggers AI analysis queue if desired.</li>
+            <li>Primary frontend function: <code>runFileProcessing()</code></li>
+            <li>Backend: <code>backend/src/validate_excel_files.py</code>, <code>backend/src/file_change_detector.py</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>run file sync</code> (shortcut: <code>2</code>)</strong>
+          <ul>
+            <li>What it does: Full sync chain: Google Drive → OneDrive → project input folder. Downloads only new/changed files using eTag and lastModifiedDateTime. Folder structure is not preserved in local input.</li>
+            <li>Primary frontend function: <code>runFileSync()</code></li>
+            <li>Backend: <code>backend/src/google_to_onedrive_sync.py</code>, <code>backend/src/onedrive_download.py</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>input</code> (shortcut: <code>3</code>)</strong>
+          <ul>
+            <li>What it does: Opens file picker and uploads one CSV/Excel file into <code>data/input</code>. Triggers change detection and shows a summary of changes (if any) before further processing.</li>
+            <li>Primary frontend functions: <code>triggerFileInput()</code> → <code>uploadAndProcess(file)</code></li>
+            <li>Backend: <code>backend/api/app.py</code> (upload endpoint), <code>backend/src/file_change_detector.py</code></li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Tool setup</h3>
+      <ol start="4">
+        <li>
+          <strong><code>authenticate onedrive</code> (shortcut: <code>4</code>)</strong>
+          <ul>
+            <li>What it does: Starts OneDrive device-code auth (or checks if token already exists).</li>
+            <li>Frontend function: <code>runOneDriveAuthSetup()</code> -> <code>startOneDriveAuth()</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>complete onedrive auth</code> (shortcut: <code>5</code>)</strong>
+          <ul>
+            <li>What it does: Completes the pending OneDrive auth session after browser sign-in.</li>
+            <li>Frontend function: <code>completeOneDriveAuth()</code></li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Individual commands for testing</h3>
+      <ol start="6">
+        <li>
+          <strong><code>analyze</code> (shortcuts: <code>analyze files</code>, <code>6</code>)</strong>
+          <ul>
+            <li>What it does: AI analysis of input file columns against config columns, with change-aware confirmation flow. Uses a local Ollama LLM to generate mapping suggestions and issue flags. Supports both manual upload and server-file auto-detect flows.</li>
+            <li>Frontend entry function: <code>startAnalyze()</code> then <code>analyzeFiles(...)</code> (manual upload flow).</li>
+            <li>Also supports server-file auto-detect flow via <code>analyzeUsingServerFiles(...)</code>.</li>
+            <li>Backend: <code>backend/api/llm_prompt.py</code>, <code>backend/api/app.py</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>download from onedrive</code> (shortcut: <code>7</code>)</strong>
+          <ul>
+            <li>What it does: OneDrive-only sync into project input folder. Downloads only new/changed files and updates a manifest log.</li>
+            <li>Frontend function: <code>runOneDriveDownload()</code></li>
+            <li>Backend: <code>backend/src/onedrive_download.py</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>run google to onedrive</code> (shortcut: <code>8</code>)</strong>
+          <ul>
+            <li>What it does: Legacy alias now routed to full file-sync behavior (Google Drive → OneDrive → input folder).</li>
+            <li>Frontend function: <code>runGoogleToOneDrive()</code></li>
+            <li>Backend: Alias to <code>run_file_sync()</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>cleanup</code> (shortcut: <code>9</code>)</strong>
+          <ul>
+            <li>What it does: Clears generated state (output, hashes, state, archive, OneDrive cache/manifest) while preserving files in <code>data/input</code>.</li>
+            <li>Frontend function: <code>runCleanup()</code></li>
+            <li>Backend: <code>backend/api/app.py</code> (cleanup endpoint)</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Legacy commands (kept for compatibility)</h3>
+      <ol start="10">
+        <li>
+          <strong><code>run excel scripts</code> (shortcut: <code>10</code>)</strong>
+          <ul>
+            <li>What it does: Alias to <code>run file processing</code>.</li>
+            <li>Frontend function: <code>runExcelScripts()</code> -> <code>runFileProcessing()</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>run validate</code> (shortcut: <code>11</code>)</strong>
+          <ul>
+            <li>What it does: Validation-only module run.</li>
+            <li>Frontend function: <code>runValidateOnly()</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong><code>run transform</code> (shortcut: <code>12</code>)</strong>
+          <ul>
+            <li>What it does: Transform-only module run.</li>
+            <li>Frontend function: <code>runTransformOnly()</code></li>
+          </ul>
+        </li>
+      </ol>
+
+      <p><strong>Support command:</strong> <code>help</code> or <code>0</code> or <code>?</code> shows the command menu.</p>
+    </section>
+
+    <hr />
+
+    <section class="panel">
+      <h2>2) Workflow of Each Command (Function Calls + Data Passed)</h2>
+      <p class="muted">The backend is a FastAPI app (<code>backend/api/app.py</code>) exposing endpoints for each command. File processing and change detection are handled by <code>backend/src/validate_excel_files.py</code> and <code>backend/src/file_change_detector.py</code>. AI analysis is performed by <code>backend/api/llm_prompt.py</code>, which calls a local Ollama LLM. File sync is handled by <code>backend/src/google_to_onedrive_sync.py</code> and <code>backend/src/onedrive_download.py</code>. Config update automation is scaffolded in <code>backend/src/prompt_auto_handle.py</code> but not yet fully implemented.</p>
+
+      <h3>A. <code>run file processing</code></h3>
+      <ol>
+        <li>Chat input is normalized in <code>sendUserMessage()</code>.</li>
+        <li><code>runFileProcessing()</code> calls <code>fetch('http://localhost:5001/run/file-processing', { method: 'POST' })</code>.</li>
+        <li>Backend <code>run_file_processing()</code> runs module <code>backend.src.validate_excel_files</code>.</li>
+        <li><code>validate_excel_files</code> calls:
+          <ul>
+            <li><code>list_excel_files(input_dir)</code></li>
+            <li><code>compare_file_without_updating(file)</code> for each file</li>
+            <li><code>run_transform(...)</code> for changed/new files</li>
+            <li>writes changed-file list to <code>data/state/.changed_files.json</code></li>
+          </ul>
+        </li>
+        <li>API response includes <code>status</code>, <code>message</code>, <code>processing_counts</code>, <code>file_details.changed_files</code>, subprocess <code>stdout</code> and <code>stderr</code>.</li>
+        <li>Frontend can trigger guided per-file analysis queue from <code>file_details.changed_files</code>.</li>
+      </ol>
+      <p><strong>Data passed:</strong> Request body none (default path); response includes changed file names and run logs.</p>
+
+      <h3>B. <code>run file sync</code></h3>
+      <ol>
+        <li><code>runFileSync()</code> uses <code>callApi('/run/file-sync', ...)</code>.</li>
+        <li>Backend <code>run_file_sync()</code> executes:
+          <ul>
+            <li><code>run_module(['backend.src.google_to_onedrive_sync'])</code></li>
+            <li>if success, then <code>run_module(['backend.src.onedrive_download'])</code></li>
+          </ul>
+        </li>
+        <li>Returns combined status + per-stage output and parsed sync counts.</li>
+      </ol>
+      <p><strong>Data passed:</strong> Request body none; response returns <code>status</code>, <code>message</code>, and stage payloads with <code>returncode</code>, <code>stdout</code>, <code>stderr</code>, and <code>sync_counts</code>.</p>
+
+      <h3>C. <code>input</code></h3>
+      <ol>
+        <li><code>triggerFileInput()</code> opens browser file picker.</li>
+        <li>On file change, frontend runs <code>uploadAndProcess(file)</code>.</li>
+        <li>Upload call uses <code>POST /upload_and_process</code> with FormData key <code>file</code>.</li>
+        <li>Backend saves file into <code>data/input/&lt;file_name&gt;</code> and runs <code>compare_file(file_name)</code>.</li>
+        <li>Frontend then calls <code>runAutoChangeDetectionForUpload(file.name)</code> using <code>POST /check_file_changes</code> and JSON body <code>{ "file_name": "...", "update_baseline": false }</code>.</li>
+        <li>User is prompted to run <code>run file processing</code> when ready.</li>
+      </ol>
+      <p><strong>Data passed:</strong> Upload request is multipart form file; change-check request is JSON file name plus baseline flag.</p>
+
+      <h3>D. <code>authenticate onedrive</code></h3>
+      <ol>
+        <li><code>runOneDriveAuthSetup()</code> -> <code>startOneDriveAuth()</code>.</li>
+        <li>Frontend calls <code>POST /run/onedrive_auth/start</code>.</li>
+        <li>Backend loads or creates MSAL token cache and starts device flow.</li>
+        <li>Response status:
+          <ul>
+            <li><code>ok</code> and <code>already_authenticated=true</code> if token is already valid</li>
+            <li><code>pending</code> with <code>auth_id</code>, <code>user_code</code>, and verification URI fields if user must sign in</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>E. <code>complete onedrive auth</code></h3>
+      <ol>
+        <li>Frontend sends stored <code>oneDriveAuthSessionId</code>.</li>
+        <li>Call uses <code>POST /run/onedrive_auth/complete</code> with JSON <code>{ "auth_id": "&lt;session_id&gt;" }</code>.</li>
+        <li>Backend checks pending device flow and returns <code>pending</code>, <code>ok</code>, or <code>error</code>.</li>
+      </ol>
+
+      <h3>F. <code>analyze</code></h3>
+      <p>There are two supported analyze workflows.</p>
+
+      <h4>F1) Manual two-file upload flow (<code>/analyze-excel_files</code>)</h4>
+      <ol>
+        <li><code>startAnalyze()</code> initializes <code>analyzeState</code> and asks for INPUT file.</li>
+        <li>After input file selection, user picks CONFIG file (or saved config is reused).</li>
+        <li><code>analyzeFiles(inputFile, configFile)</code> runs a two-phase API flow.</li>
+      </ol>
+      <p><strong>Phase 1 (prepare only):</strong> sends input and config files, confirm flags, and retry settings; backend builds change-aware prompt context and may return confirmation-needed state.</p>
+      <p><strong>Phase 2 (execute prompt):</strong> sends prepared prompt fields; backend calls <code>query_llm(prepared_prompt)</code> and returns <code>ai_summary</code> + context and timing metadata.</p>
+
+      <h4>F2) Auto-detect server-file flow (<code>/analyze-excel_files-from-input</code>)</h4>
+      <ol>
+        <li>Frontend call: <code>analyzeUsingServerFiles(...)</code> -> <code>analyzePreparedInputFile(null, options)</code>.</li>
+        <li>Request uses JSON fields such as <code>input_file_name</code>, <code>config_file_name</code>, <code>save_default_config</code>, <code>confirm_ai_analysis</code>, and <code>prepare_only</code>.</li>
+        <li>Backend selects latest usable input in <code>data/input</code> and config in <code>data/config</code>.</li>
+        <li>Depending on config status it can return <code>needs_config_upload</code>, <code>single</code>, or <code>needs_config_selection</code>.</li>
+        <li>For changed or no_change statuses it returns <code>needs_analysis_confirmation</code> unless confirmed.</li>
+        <li>On confirmed run it builds prompt and calls LLM.</li>
+      </ol>
+
+      <h3>G. <code>download from onedrive</code></h3>
+      <ol>
+        <li>Frontend <code>runOneDriveDownload()</code> -> <code>callApi('/run/onedrive_download', ...)</code>.</li>
+        <li>Backend runs <code>python -m backend.src.onedrive_download</code>.</li>
+        <li>OneDrive module acquires token, lists folder via Graph API, compares with manifest, downloads changed files into <code>data/input</code>, and updates <code>data/state/onedrive_manifest.xlsx</code>.</li>
+      </ol>
+
+      <h3>H. <code>run google to onedrive</code></h3>
+      <ol>
+        <li>Frontend sends <code>POST /run/google_to_onedrive</code>.</li>
+        <li>Backend route is an alias to <code>run_file_sync()</code>.</li>
+        <li>Operationally same behavior as <code>run file sync</code>.</li>
+      </ol>
+
+      <h3>I. <code>cleanup</code></h3>
+      <ol>
+        <li>Frontend sends <code>POST /run/cleanup</code>.</li>
+        <li>Backend clears generated directories:
+          <ul>
+            <li><code>data/output</code></li>
+            <li><code>data/state/hashes</code></li>
+            <li><code>data/state</code></li>
+            <li><code>data/archive</code></li>
+            <li>OneDrive local cache folder</li>
+            <li>OneDrive manifest file</li>
+          </ul>
+        </li>
+        <li>Preserves <code>data/input</code>.</li>
+      </ol>
+
+      <h3>J. Legacy commands</h3>
+      <p><strong><code>run excel scripts</code>:</strong> Calls <code>runFileProcessing()</code>; same request/data model as command A.</p>
+      <p><strong><code>run validate</code>:</strong> Calls <code>POST /run/validate</code>; runs only <code>backend.src.validate_excel_files</code>.</p>
+      <p><strong><code>run transform</code>:</strong> Calls <code>POST /run/transform</code>; runs only <code>backend.src.transforming_excel</code>.</p>
+    </section>
+
+    <hr />
+
+    <section class="panel">
+      <h2>3) Consumer Workflow (Ideal End-to-End)</h2>
+      <p class="muted">All state, hashes, and responses are stored in <code>data/state</code>, <code>data/archive</code>, and <code>data/responses</code>. The frontend chat interface (see <code>frontend/assets/js/chat_intake.js</code>) handles file uploads, command parsing, and displays results. It interacts with the backend via fetch calls to endpoints like <code>/run/file-processing</code>, <code>/upload_and_process</code>, etc. The frontend supports both manual and auto-detect flows for analysis.</p>
+      <p>This is the target operating flow for consumers.</p>
+      <ol>
+        <li>
+          <strong>Sync source data from Google Drive into OneDrive</strong>
+          <ul>
+            <li>Run <code>run file sync</code>.</li>
+            <li>Stage 1 updates OneDrive backup folder from Google Drive.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Sync OneDrive files into local project input</strong>
+          <ul>
+            <li>Stage 2 of <code>run file sync</code> (or <code>download from onedrive</code>) downloads changed files into <code>data/input</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Detect what actually changed and prepare files</strong>
+          <ul>
+            <li>Run <code>run file processing</code>.</li>
+            <li>System compares each input file against saved baselines and marks only changed/new files for analysis.</li>
+            <li>Changed-file manifest is written to <code>data/state/.changed_files.json</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Run file processing to generate and save LLM responses</strong>
+          <ul>
+            <li>Run <code>run file processing</code>. For each changed input file, the system uses the AI model to generate mapping suggestions and issue flags, saving each response as a record in <code>data/responses/</code>.</li>
+            <li>Responses are not immediately applied to config files; they are saved for review and approval.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Review and apply LLM responses to update config</strong>
+          <ul>
+            <li>Run <code>process responses</code>. This command allows you to review each saved LLM response, preview the proposed mapping/config changes, and approve or skip each one.</li>
+            <li>Approved changes are (or will be) applied to config files in <code>data/config</code> via a deterministic Python update script (automation in progress).</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Update config using Python based on approved mappings</strong>
+          <ul>
+            <li>Ideal state: parse AI mapping output into structured records, then apply those mappings to config files in <code>data/config</code> via a deterministic Python update script.</li>
+            <li>Recommended controls:
+              <ul>
+                <li>Keep a backup/version of old config before overwrite.</li>
+                <li>Validate mapped columns exist in input.</li>
+                <li>Run a dry-run preview before final write.</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Re-run processing with updated config and verify output</strong>
+          <ul>
+            <li>Re-run <code>run file processing</code> and/or <code>analyze</code> to validate the new mapping behavior.</li>
+          </ul>
+        </li>
+      </ol>
+      <p><strong>Important current-state note:</strong> Today, the code clearly generates AI mapping suggestions (<code>ai_summary</code>) and saves LLM response records in <code>data/responses/</code>. However, there is not yet a dedicated built-in step that automatically writes those suggestions back into config schema files. The config-update automation is scaffolded in <code>backend/src/prompt_auto_handle.py</code> and will be implemented as a separate Python action/script for production reliability. Human review is required before config changes are applied.</p>
+    </section>
+
+    <hr />
+
+    <section class="panel">
+      <h2>4) Data Flow Diagram + Explanations</h2>
+      <p class="muted">The project uses Docker Compose with three main services: <code>web</code> (frontend), <code>etl</code> (processing), and <code>api</code> (backend). Volumes are mounted for persistent data and code sharing. All major logic is in <code>backend/src</code> and <code>frontend/assets/js</code>.</p>
+      <div class="mermaid">
+flowchart TD
+    A[Google Drive Source Files] --> B[run file sync\nPOST /run/file-sync]
+    B --> C[backend.src.google_to_onedrive_sync\nGoogle -> OneDrive backup]
+    C --> D[OneDrive Remote Folder]
+    D --> E[backend.src.onedrive_download\nGraph API + manifest compare]
+    E --> F[data/input\nlocal project input files]
+
+    F --> G[run file processing\nPOST /run/file-processing]
+    G --> H[backend.src.validate_excel_files\nchange detection + prepare changed files]
+    H --> I[data/state/.changed_files.json]
+    H --> J[data/archive\nbaselines/history]
+
+    F --> K[analyze\nPOST /analyze-excel_files or /analyze-excel_files-from-input]
+    L[data/config\nselected config file] --> K
+    K --> M[extract_columns + prompt build]
+    M --> N[query_llm via Ollama]
+    N --> O[ai_summary\nmapping suggestions]
+
+    O --> P[Human review or automation parser]
+    P --> Q[Python config update step\nwrite updated config in data/config]
+    Q --> K
+      </div>
+      <p class="diagram-note">If the diagram does not render, check internet access for the Mermaid CDN script and refresh the page.</p>
+
+      <h3>Diagram explanation by stage</h3>
+      <ol>
+        <li><strong>Source sync stage:</strong> Google Drive source files are synced into OneDrive through the file-sync command.</li>
+        <li><strong>Download stage:</strong> OneDrive downloader only fetches new/modified files, then writes them to <code>data/input</code>.</li>
+        <li><strong>Change-detection stage:</strong> Processing reads <code>data/input</code>, compares with saved baselines in archive/hash state, and records changed files.</li>
+        <li><strong>Analysis stage:</strong> Analyze combines selected input and config, extracts column structure, creates a change-aware prompt, and gets LLM mapping suggestions.</li>
+        <li><strong>Config-update stage:</strong> Approved mapping suggestions are applied to config using Python logic, then saved back into <code>data/config</code>.</li>
+        <li><strong>Closed-loop iteration:</strong> Updated config feeds the next analysis run, enabling iterative improvement.</li>
+      </ol>
+    </section>
+
+    <hr />
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ETL output artifacts
+data/output/
+data/state/
+data/archive/
+# data/responses/
+!data/output/.gitkeep
+
+# Legacy generated folders kept ignored during migration.
+data/hashes/
+data/onedrive/
+
+# Benchmark reports
+benchmarks/benchmark_report_*.md
+
+/backend/tests/test_data
+
+.vscode/
+backend/saved_files/
+backend/src/saved_files/
+
+secrets
+.env
+.venv
+
+# Service account credentials (never commit)
+backend/src/riverrockadvisors-api-key.json
+consumer-bundle/config/riverrockadvisors-api-key.json
+secrets/riverrockadvisors-api-key.json

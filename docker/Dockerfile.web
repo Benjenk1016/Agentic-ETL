@@ -1,0 +1,8 @@
+FROM nginx:alpine
+
+COPY frontend/config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/public/index.html /usr/share/nginx/html/index.html
+COPY frontend/public/setup.html /usr/share/nginx/html/setup.html
+COPY frontend/public/specs.html /usr/share/nginx/html/specs.html
+COPY frontend/assets/css/styles.css /usr/share/nginx/html/assets/css/styles.css
+COPY frontend/assets/js/chat_intake.js /usr/share/nginx/html/assets/js/chat_intake.js

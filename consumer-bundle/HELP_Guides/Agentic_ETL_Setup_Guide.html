@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic ETL Initial Setup Guide</title>
+    <style>
+        :root {
+            --page-bg: #edf2f8;
+            --panel-bg: #ffffff;
+            --hero-bg: linear-gradient(135deg, #0f3f6e 0%, #1b6ec5 100%);
+            --text-main: #16314c;
+            --text-muted: #5a738d;
+            --border: #d2deea;
+            --accent: #1b6ec5;
+            --accent-dark: #0f3f6e;
+            --success-bg: #ebf8f0;
+            --success-text: #1a6b3a;
+            --warning-bg: #fff6e8;
+            --warning-text: #875e09;
+            --code-bg: #10273d;
+            --shadow: 0 16px 38px rgba(16, 55, 93, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f8fbfe 0%, var(--page-bg) 100%);
+            color: var(--text-main);
+            line-height: 1.7;
+            font-size: 18px;
+        }
+
+        a {
+            color: var(--accent-dark);
+        }
+
+        .page {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 28px 20px 56px;
+        }
+
+        .hero {
+            background: var(--hero-bg);
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 34px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 860px;
+            font-size: 1.08rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .badge {
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 28px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 10px 26px rgba(22, 49, 76, 0.08);
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin-top: 0;
+        }
+
+        .intro-list,
+        .step-list,
+        .check-list {
+            margin: 0;
+            padding-left: 24px;
+        }
+
+        .intro-list li,
+        .step-list li,
+        .check-list li {
+            margin-bottom: 10px;
+        }
+
+        .step-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            background: #ffffff;
+            margin-top: 14px;
+        }
+
+        .step-label {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #e8f1ff;
+            color: var(--accent-dark);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .note,
+        .tip,
+        .important {
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: 14px;
+        }
+
+        .note {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .tip {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .important {
+            background: #ebf2ff;
+            color: #1a3f7a;
+            border: 1px solid #cfe0ff;
+        }
+
+        .code-block {
+            margin-top: 12px;
+            background: var(--code-bg);
+            color: #eef5fd;
+            border-radius: 14px;
+            padding: 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .screenshot-slot {
+            margin-top: 16px;
+            border: 2px dashed #97b4d1;
+            border-radius: 14px;
+            padding: 14px;
+            background: #f8fbff;
+        }
+
+        .screenshot-slot strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .screenshot-slot p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .footer-note {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                padding: 18px 12px 40px;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+
+            .step-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <section class="hero">
+            <h1>Agentic ETL Initial Setup Guide</h1>
+            <p>
+                Use this page for full machine setup, account connection, and environment configuration.
+                Once these steps are complete, use the app quick-start guide inside the frontend for day-to-day usage.
+            </p>
+            <div class="hero-badges">
+                <div class="badge">One-time setup per machine</div>
+                <div class="badge">Includes Docker, Ollama, Google Drive, OneDrive, and .env setup</div>
+            </div>
+        </section>
+
+        <main class="content">
+            <section class="panel">
+                <h2>Before you begin</h2>
+                <ul class="intro-list">
+                    <li>You need local admin permissions to install Docker Desktop and Ollama.</li>
+                    <li>You should have access to project credentials and account ownership before starting.</li>
+                    <li>If you need to set up the tool with a new OneDrive account, you will need admin permission for
+                        one step.</li>
+                    <li>The tool requires Docker Desktop and Ollama to be running in the background before use.</li>
+                </ul>
+            </section>
+
+
+            <section class="panel">
+                <h2>Install required tools first</h2>
+                <div class="tip" style="margin-bottom:16px;">
+                    <strong>If you already have Docker Desktop and Ollama installed:</strong><br>
+                    Open both applications and leave them running in the background while using the tool.<br>
+                    Make sure you see their icons in your system taskbar (bottom right on Windows, top bar on Mac).<br>
+                    You may close them after you are done with the tool to save RAM/battery.
+                    <div class="screenshot-slot" style="margin-top:10px;">
+                        <img src="../Project-Setup-Guide-Images/Ensure-Ollama-Docker-Are-Running.png"
+                            alt="Docker and Ollama running in taskbar" style="max-width:100%;border-radius:10px;">
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Installation Step 1</div>
+                    <h3>Install Docker Desktop</h3>
+                    <ol class="step-list">
+                        <li>Go to <a href="https://www.docker.com/products/docker-desktop" target="_blank"
+                                rel="noreferrer">docker.com/products/docker-desktop</a>.</li>
+                        <li>Download Docker Desktop for your system and run the installer.</li>
+                        <li>Open Docker Desktop and wait until it shows that the engine is running.</li>
+                        <li>You may minimize or exit out of Docker Desktop, but verify that it is running in the taskbar
+                            (bottom right on Windows, top bar on Mac).</li>
+                        <div class="screenshot-slot" style="margin-top:10px;">
+                            <img src="../Project-Setup-Guide-Images/Ensure-Ollama-Docker-Are-Running.png"
+                                alt="Docker and Ollama running in taskbar" style="max-width:100%;border-radius:10px;">
+                        </div>
+
+                    </ol>
+
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Installation Step 2</div>
+                    <h3>Install Ollama and pull a model</h3>
+                    <div class="tip">
+                        <strong>Note:</strong> The tool will automatically pull (download) the required Ollama model
+                        based on your <strong>.env</strong> file configuration (see the .env setup section below). You
+                        may skip steps 2 and 3 if you want to let the tool handle this automatically, but it may take
+                        extra time during the first usage. If you want to have the model ready to go before starting the
+                        tool, follow step 2 to pull the model, and follow step 3 to verify Ollama is not giving any
+                        errors.
+                    </div>
+
+                    <ol class="step-list">
+                        <li>Go to <a href="https://ollama.com/download" target="_blank"
+                                rel="noreferrer">ollama.com/download</a> and install Ollama.</li>
+                        <li>(optional) Open a terminal and pull your model.</li>
+                    </ol>
+                    <div class="code-block">ollama pull tinyllama:1.1b</div>
+                    <ol class="step-list" start="3">
+                        <li>(optional) Verify Ollama is reachable locally; You can run this command on any terminal, and
+                            as long as you don't get any errors, you should be all set.</li>
+                    </ol>
+                    <div class="code-block">curl http://localhost:11434/api/tags</div>
+                    <div class="screenshot-slot">
+                        <img src="../Project-Setup-Guide-Images/Valid-Ollama-Response.png"
+                            alt="Ollama tags output in terminal" style="max-width:100%;border-radius:10px;">
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Fast path: use the pre-configured BGSU .env file</h2>
+                <div class="important">
+                    The BGSU Capstone team already created and set up a .env file configured to the BGSU Capstone Google
+                    Drive and OneDrive accounts.
+                    It is not published in GitLab because it contains sensitive account IDs.
+                    If you received it through a secure email or some other means, you may drag and drop it into the
+                    main project folder,
+                    then use the authenticate onedrive commands with the BGSU Capstone Microsoft account (fast path step
+                    2).
+                    After authentication completes, the tool should be fully ready to use with the BGSU accounts without
+                    any further configuration.
+                </div>
+                <div class="step-card">
+                    <div class="step-label">Fast Path Step 1</div>
+                    <h3>Place the .env file in the project root</h3>
+                    <ol class="step-list">
+                        <li>Find the secure .env file sent by your team.</li>
+                        <li>Copy or drag it into the project root folder.</li>
+                        <li>Confirm the filename is exactly <strong>.env</strong>.</li>
+                    </ol>
+                    <div class="screenshot-slot">
+                        <img src="../Project-Setup-Guide-Images/show-env-in-root.png" alt="Copy .env file to project root"
+                            style="max-width:100%;border-radius:10px;">
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Fast Path Step 2</div>
+                    <h3>Run OneDrive authentication in chat</h3>
+                    <div class="important">
+                        <strong>Skip ahead:</strong> You need to start the tool locally, and then authenticate OneDrive so it can connect properly to OneDrive. <a href="#Start-Tool">Skip to Start Tool section</a>.
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Full manual setup (new account or no .env access)</h2>
+                <div class="note">
+                    If you do not have access to the .env file or want to set up this tool on a new account,
+                    follow this guide exactly. Docker and Ollama should already be installed from the section above.
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 1</div>
+                    <h3>Create and fill the .env file</h3>
+                    <ol class="step-list">
+                        <li>Make a copy of the file "<strong></strong>.env.example</strong>" and rename it to
+                            <strong>.env</strong> in the project root.
+                        </li>
+
+                        <img src="../Project-Setup-Guide-Images/Copy-Env-File.png"
+                            alt="Make a copy of the .env.example file and rename it to .env"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;"> </img>
+                        <li>You may open it with your preferred text editor, Windows Notepad works perfectly. Note that
+                            the lines starting with '#' are comments and only exist for your reference. More
+                            detailed comments are included in the example file. It should look something like this:</li>
+                    </ol>
+                    <img src="../Project-Setup-Guide-Images/Open-Env-File-With-Notepad.png"
+                        alt="Open .env file with text editor"
+                        style="max-width:100%;border-radius:10px;margin-top:12px;">
+                    <p>The following steps will guide you through how to setup and configure these entries</li>
+                </div>
+                <div class="step-card">
+                    <div class="step-label">Step 2</div>
+                    <h3>Google Drive setup</h3>
+                    <p>This step connects the tool to Google Drive so it can automatically download files from a shared
+                        folder into the project.</p>
+                    <ol class="step-list">
+                        <li>Get the Google service account JSON key file from your admin or team. This file is named
+                            <strong>riverrockadvisors-api-key.json</strong> and is specific to River Rock Advisors.</li>
+                        <li>Place the file inside the project's <strong>secrets/</strong> folder. The filename must be
+                            exactly <strong>riverrockadvisors-api-key.json</strong> — Docker mounts this file
+                            automatically when the tool starts.</li>
+                        <li>Open the Google Drive folder that contains the files you want to sync. The folder ID is the
+                            string of characters at the end of the URL after <strong>/folders/</strong>.
+                            <br><br>For example, in the URL:
+                            <div class="code-block">https://drive.google.com/drive/folders/1A2B3C4D5E6F7G8H</div>
+                            the folder ID is <strong>1A2B3C4D5E6F7G8H</strong>.
+                        </li>
+                        <li>Open your <strong>.env</strong> file and set:
+                            <div class="code-block">GOOGLE_DRIVE_FOLDER_ID=your-folder-id-here</div>
+                        </li>
+                        <li>Make sure the service account email address has been granted at least
+                            <strong>Viewer</strong> access to that Google Drive folder. Your admin can confirm this —
+                            without it, the sync will fail with a permissions error.</li>
+                    </ol>
+                    <p>Once this is done, the tool will be able to download new and updated files from the Google Drive
+                        folder whenever you run <strong>run google to onedrive</strong> in the chat.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 3</div>
+                    <h3>Set up the local OneDrive backup folder</h3>
+                    <p>When the tool downloads files from Google Drive, it saves a copy to a local backup folder in
+                        addition to the project input folder. This backup folder should be a folder that the OneDrive
+                        Desktop app is already syncing to the cloud, so that files are automatically backed up to
+                        OneDrive as well.</p>
+                    <ol class="step-list">
+                        <li>Make sure the <strong>OneDrive Desktop app</strong> is installed and signed in to the River
+                            Rock Advisors account on this computer.</li>
+                        <li>Locate the synced OneDrive folder on your computer. It is typically found at one of these
+                            paths:
+                            <div class="code-block">Mac:
+                                /Users/your-name/Library/CloudStorage/OneDrive-RiverRockAdvisors/GoogleSheetsBackups
+                                Windows: C:\Users\your-name\OneDrive - RiverRockAdvisors\GoogleSheetsBackups</div>
+                            If the <strong>GoogleSheetsBackups</strong> folder does not exist yet, create it inside the
+                            OneDrive folder.
+                        </li>
+                        <li>Open your <strong>.env</strong> file and set <strong>ONEDRIVE_BACKUP_DIR</strong> to that
+                            path:
+                            <div class="code-block"># Mac example:
+                                ONEDRIVE_BACKUP_DIR=/Users/your-name/Library/CloudStorage/OneDrive-RiverRockAdvisors/GoogleSheetsBackups
+
+                                # Windows example:
+                                ONEDRIVE_BACKUP_DIR=C:\Users\your-name\OneDrive - RiverRockAdvisors\GoogleSheetsBackups
+                            </div>
+                        </li>
+                        <li>Confirm that the OneDrive Desktop app shows this folder as synced (not paused). When the
+                            tool downloads a file from Google Drive, it will save it to this folder, and the OneDrive
+                            Desktop app will automatically upload it to OneDrive cloud.</li>
+                    </ol>
+                    <p>After this step the full flow will be: <strong>Google Drive → project input folder + local
+                            OneDrive backup folder → OneDrive cloud</strong>.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 3</div>
+                    <h3>Create a OneDrive app registration in Azure</h3>
+                    <ol class="step-list">
+                        <li>Open <a href="https://entra.microsoft.com" target="_blank"
+                                rel="noreferrer">entra.microsoft.com</a> and log into the account you intend to connect
+                            the tool to.</li>
+                        <li>Select "App registrations" on the left side </li>
+                        <img src="../Project-Setup-Guide-Images/Azure-Main-Page.png"
+                            alt="Azure portal with App registrations highlighted in left sidebar"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Click the "New registration" button.</li>
+                        <li>Name it something memorable such as "OneDrive Download for Agentic ETL"</li>
+
+                        <li>Select account type as "single tenant only - River Rock Advisors".</li>
+
+                        <li>Leave redirect URI blank and click "register".</li>
+                        <img src="../Project-Setup-Guide-Images/Register-App-Registration.png"
+                            alt="Azure App registration page with example name filled in"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Now that you are on the App registration screen, you need to copy 2 of these values into the
+                            .env file </li>
+                        <li>Copy the "Application (client) ID" value into the .env file as ONEDRIVE_CLIENT_ID.</li>
+                        <li>Copy the "Directory (tenant) ID" value into the .env file as ONEDRIVE_TENANT.</li>
+                        <img src="../Project-Setup-Guide-Images/App-Registration-Copy-IDs-from-Azure.png"
+                            alt="Azure App registration page with IDs highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <img src="../Project-Setup-Guide-Images/Place-Copied-Azure-IDs-Into-ENV.png"
+                            alt="Example .env file with OneDrive IDs highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Next, go to the "API Permissions" section on the left sidebar, and click the "+ Add a
+                            permission" button in the middle of the page </li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-1.png"
+                            alt="Azure App registration page with API permissions highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Click "Microsoft Graph" </li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-2.png"
+                            alt="Azure API permissions page with Microsoft Graph option highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Select Delegated permissions</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-3.png"
+                            alt="Delegated permissions selection"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Search for "Files.Read.All" (captilization matters), and expand the Files box</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-4.png"
+                            alt="Search for Files.Read.All permission"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Check the "Files.Read.All" permission and click "Add permission" at the bottom</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-5.png"
+                            alt="Select Files.Read.All permission and add it"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>What this does: It allows a remote application to access OneDrive files on behalf of the
+                            user. This way, we can download onedrive files programmatically into the tool, and then
+                            process them</li>
+                        <li>Now, you should see the added permission in the list</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-API-Permissions-6.png"
+                            alt="API permissions page showing added permission"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Next, go to the "Authentication (Preview)" section on the left sidebar.</li>
+                        <li>The feature we want to use is only available on the "old experience" for whatever reason. So
+                            you need to click the blue link in the blue box to switch to that experience</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-Auth-Preview-Main-Page.png"
+                            alt="Azure Authentication page with link to old experience highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Once you are in the old experience, first check that the dropdown box of "Supported account
+                            types" says "single tenant - River Rock Advisors", and if not then change it. </li>
+                        <li>Next, scroll down to the "Advanced settings" section at the bottom, and change "Allow public
+                            client flows" to "Yes", and click save at the bottom. This will allow the application to
+                            properly connect</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-Auth-Preview-PublicClientFlows.png"
+                            alt="Azure Authentication page with Allow public client flows setting highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Still in the Authentication old view, click the "+ Add a platform" button, and select
+                            "Mobile and Desktop Applications". This, along with the previous steps, will allow the
+                            application to function properly.</li>
+                        <img src="../Project-Setup-Guide-Images/Azure-Auth-Preview-2.png"
+                            alt="Azure Authentication page with Add a platform button highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>In order to allow the application to log in to the Microsoft account API for you, you need
+                            to select the third option, which end in "MSAL only". Then click configure at the bottom
+                        </li>
+                        <img src="../Project-Setup-Guide-Images/Azure-Auth-Preview-3.png"
+                            alt="Platform configuration with MSAL only option highlighted"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Now, the OneDrive account should be all set up and authenticated! Next, log into the
+                            OneDrive account, and decide which folder you would like this tool to pull from. Note that
+                            it pulls all Excel and CSV files in all subfolders as well.
+                            It is recommended to use the same folder that was set up in the Google Drive section, so
+                            that files may transfer from [Google Drive -> One Drive -> Local project folders]
+                            seamlessly. Place the name of the folder you want to use in the .env file's
+                            ONEDRIVE_REMOTE_FOLDER variable, as follows:</li>
+                        <div class="code-block">ONEDRIVE_REMOTE_FOLDER=YourFolderName</div>
+
+                    </ol>
+
+
+
+                </div>
+
+                <div class="step-card">
+                    <h3 id="Start-Tool">Start the Tool</h3>
+                    <div class="step-label">Step 5</div>
+                    <h3>Before starting the services, double check that the .env file has been properly filled in, and
+                        that it has been saved (Ctrl + S) and closed.</h3>
+                    <p>By this point, all fields should be populated with the correct values. Leave the local paths as
+                        they are unless you have a specific reason to change them.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 4</div>
+                    <h3>Start services</h3>
+                    <ol class="step-list">
+                        <li>Keep Docker and Ollama running in the background.</li>
+                        <li>In the project root, there will be 2 buttons: start_my_app.bat and stop_my_app.bat.
+                            If they do not currently exist, you will need to instead right click in the project root,
+                            click "Open with Terminal" (PowerShell also works), and copy/paste the following command:
+                        </li>
+                    </ol>
+                    <div class="code-block">docker compose -f config/docker-compose.yml --env-file config/.env up --build -d web api</div>
+                    <img src="../Project-Setup-Guide-Images/Open-Terminal.png" alt="Open terminal in project root"
+                        style="max-width:100%;border-radius:10px;margin-top:12px;">
+                    <img src="../Project-Setup-Guide-Images/Use-docker-cmd.png"
+                        alt="Terminal with docker compose up command"
+                        style="max-width:100%;border-radius:10px;margin-top:12px;">
+                    <li>The app will take a few moments to start. When the messages at the bottom show check boxes and
+                        the terminal opens a new line, the app is ready to go!</li>
+                    <img src="../Project-Setup-Guide-Images/Docker-Command-Done.png"
+                        alt="Terminal showing docker command output and new line"
+                        style="max-width:100%;border-radius:10px;margin-top:12px;">
+
+                    <ol class="step-list" start="3">
+                        <li>Open <a href="http://localhost:8080" target="_blank"
+                                rel="noopener">http://localhost:8080</a> in your browser.</li>
+                    </ol>
+                    <img src="../Project-Setup-Guide-Images/Open-Web-UI.png" alt="Browser with localhost:8080 opened"
+                        style="max-width:100%;border-radius:10px;margin-top:12px;">
+                </div>
+
+                <div>
+                    You are almost there! The last step is to authenticate the OneDrive account, then you can explore
+                    and use the tool.
+                    Note that there are 2 clickablebuttons at the top: "Project Quick Start Guide" and "Detailed
+                    Specifications". They will open separate web pages with different information.
+                    The quick start guide has instructions for using the tool day-to-day after setup, and the detailed
+                    specifications has in-depth technical details on how the tool works on the backend, along with
+                    diagrams.
+                </div>
+                <div screenshot-slot>
+
+                </div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 5</div>
+                    <ol class="step-list">
+                        <li>In the web interface chat, run <strong>authenticate onedrive</strong>.</li>
+                        <img src="../Project-Setup-Guide-Images/Auth-Onedrive-in-webUI.png"
+                            alt="Chat input with authenticate onedrive command"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>It will prompt you to go to <a href="https://microsoft.com/devicelogin" target="_blank"
+                                rel="noreferrer">microsoft.com/devicelogin</a> and enter the code shown by the app.</li>
+                        <img src="../Project-Setup-Guide-Images/Auth-Onedrive-2.png"
+                            alt="Authentication instructions with code and URL"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>Sign in to the Microsoft account that owns the OneDrive destination.</li>
+                        <img src="../Project-Setup-Guide-Images/Auth-OneDrive-3.png" alt="Microsoft login page"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <img src="../Project-Setup-Guide-Images/Auth-Onedrive-4.png"
+                            alt="Chat input with complete onedrive auth command"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                        <li>At this step, there is a high chance that Microsoft will ask for Admin approval. If this happens, contact your system administrator.</li>
+                        <li>Return to chat and run <strong>complete onedrive auth</strong>.</li>
+                        <img src="../Project-Setup-Guide-Images/Complete-onedrive-auth.png"
+                            alt="Chat input with complete onedrive auth command"
+                            style="max-width:100%;border-radius:10px;margin-top:12px;">
+                    </ol>
+                </div>
+
+                <div>Now, we have successfuly authenticated the OneDrive App Registration, and the tool can successfully
+                    interact with the OneDrive account and specified folder.</div>
+
+                <div class="step-card">
+                    <div class="step-label">Step 6</div>
+                    <h3>Open the quick start guide and start using the tool!</h3>
+
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Shutting down the app</h2>
+                <ol class="step-list">
+                    <li>When you are done using the tool, run the stop_program.bat file if it exists. If not, follow
+                        steps 2 and 3:</li>
+                    <li>Open a new terminal or reuse the same terminal from earlier steps.</li>
+                    <li>Run the following command to stop all running containers and turn off the tool:</li>
+                </ol>
+                <div class="code-block">docker compose -f config/docker-compose.yml --env-file config/.env down</div>
+                <img src="../Project-Setup-Guide-Images/docker-shut-down.png"
+                    alt="Terminal with docker compose down command"
+                    style="max-width:100%;border-radius:10px;margin-top:12px;">
+                <ol class="step-list" start="3">
+                    <li>Navigate to your system taskbar and close Docker Desktop to free up RAM.</li>
+                </ol>
+                <img src="../Project-Setup-Guide-Images/quit-docker-desktop.png"
+                    alt="Docker desktop with quit option highlighted"
+                    style="max-width:100%;border-radius:10px;margin-top:12px;">
+                <ol class="step-list" start="4">
+                    <li>Close Ollama from the taskbar/system tray as well.</li>
+                </ol>
+                <img src="../Project-Setup-Guide-Images/quit-ollama.png" alt="Ollama with quit option highlighted"
+                    style="max-width:100%;border-radius:10px;margin-top:12px;">
+            </section>
+
+            <section class="panel">
+                <h2>Quick troubleshooting</h2>
+                <ul class="check-list">
+                    <li>If localhost:8080 does not load, confirm Docker containers are running.</li>
+                    <li>If analyze fails, confirm Ollama is running and model name matches OLLAMA_MODEL_NAME.</li>
+                    <li>If OneDrive auth fails, re-run authenticate onedrive and complete onedrive auth.</li>
+                    <li>If sync shows no files unexpectedly, verify GOOGLE_DRIVE_FOLDER_ID and access rights.</li>
+                    <li>If needed, use cleanup in chat and retry sync/process flow.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+
+<a id="bottom"></a>
+</html>

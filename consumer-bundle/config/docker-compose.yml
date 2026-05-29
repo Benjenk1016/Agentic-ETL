@@ -1,0 +1,37 @@
+services:
+  web:
+    image: ${WEB_IMAGE:-benjenk/agentic-end-to-end-web:v0.2} #default to v0.2 incase the env file fails to pull current images
+    container_name: agentic-etl-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  api:
+    image: ${API_IMAGE:-benjenk/agentic-end-to-end-api:v0.2} #default to v0.2 incase the env file fails to pull current images
+    container_name: agentic-etl-api
+    ports:
+      - "5001:5000"
+    environment:
+      - INPUT_DIR=/data/input
+      - OUTPUT_DIR=/data/output
+      - HASH_DIR=/data/hashes
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/run/secrets/google_service_account.json
+      - ONEDRIVE_DOWNLOAD_DIR=/data/input
+      - ONEDRIVE_MANIFEST=/data/state/onedrive_manifest.xlsx
+      - ONEDRIVE_TOKEN_CACHE=/data/state/token_cache.bin
+      - OLLAMA_MODEL_NAME=${OLLAMA_MODEL_NAME:-qwen2.5:3b}
+      - OLLAMA_API_URL=${OLLAMA_API_URL:-http://host.docker.internal:11434/api/generate}
+    env_file:
+      - ./.env
+    volumes:
+      - ../data/config:/data/config
+      - ../data/input:/data/input
+      - ../data/output:/data/output
+      - ../data/hashes:/data/hashes
+      - ../data/responses:/data/responses
+      - ../data/state:/data/state
+      - ../data/archive:/data/archive
+      - ../data/onedrive:/data/onedrive
+      - ./riverrockadvisors-api-key.json:/run/secrets/google_service_account.json:ro
+      - ${ONEDRIVE_BACKUP_DIR}:/data/GoogleSheetsBackups
+    restart: unless-stopped

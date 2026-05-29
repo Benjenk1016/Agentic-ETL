@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: agentic-benchmark-ollama
+    ports:
+      - "11435:11434"  # Different port from main app (11434)
+    volumes:
+      - benchmark_ollama_data:/root/.ollama
+    restart: unless-stopped
+    # Memory limit: Set based on available RAM. Default: unrestricted (uses all available)
+    # For systems with <8GB total RAM, leave unrestricted to maximize available memory
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 6g  # Uncomment and adjust if you have tight memory constraints
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  benchmark_ollama_data:

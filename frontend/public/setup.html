@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic ETL Command Guide</title>
+<style>
+		.guide-image {
+			display: block;
+			max-width: 100%;
+			width: 100%;
+			height: auto;
+			margin: 24px auto 24px auto;
+			border-radius: 16px;
+			box-shadow: 0 4px 24px rgba(23, 50, 77, 0.10);
+			border: 1.5px solid #d5e0ea;
+			background: #f7fafc;
+			object-fit: contain;
+			transition: box-shadow 0.2s;
+		}
+		.guide-image:hover {
+			box-shadow: 0 8px 32px rgba(23, 50, 77, 0.18);
+		}
+	:root {
+		--page-bg: #eef3f7;
+		--panel-bg: #ffffff;
+		--hero-bg: linear-gradient(180deg, #1b4d7a 0%, #2d6cdf 100%);
+		--text-main: #17324d;
+		--text-muted: #5b7288;
+		--border: #d5e0ea;
+		--accent: #2d6cdf;
+		--accent-dark: #173f86;
+		--success-bg: #ecf7f0;
+		--success-text: #1f6a3d;
+		--warning-bg: #fff6e5;
+		--warning-text: #875d08;
+		--code-bg: #10253a;
+		--shadow: 0 18px 45px rgba(17, 59, 99, 0.12);
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		margin: 0;
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+		background: linear-gradient(180deg, #f7fafc 0%, var(--page-bg) 100%);
+		color: var(--text-main);
+		line-height: 1.7;
+		font-size: 19px;
+	}
+
+	a {
+		color: var(--accent-dark);
+	}
+
+	.page {
+		max-width: 980px;
+		margin: 0 auto;
+		padding: 28px 20px 56px;
+	}
+
+	.hero {
+		background: var(--hero-bg);
+		color: #ffffff;
+		border-radius: 24px;
+		padding: 36px;
+		box-shadow: var(--shadow);
+	}
+
+	.hero h1 {
+		margin: 0 0 12px;
+		font-size: clamp(2.2rem, 4vw, 3.2rem);
+		line-height: 1.1;
+	}
+
+	.hero p {
+		max-width: 780px;
+		margin: 0;
+		font-size: 1.15rem;
+	}
+
+	.hero-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 20px;
+	}
+
+	.badge {
+		padding: 10px 16px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.18);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		font-size: 1rem;
+	}
+
+	.layout {
+		display: block;
+		margin-top: 28px;
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.panel {
+		background: var(--panel-bg);
+		border: 1px solid var(--border);
+		border-radius: 22px;
+		padding: 28px;
+		box-shadow: 0 10px 28px rgba(23, 50, 77, 0.08);
+	}
+
+	.panel h2,
+	.panel h3 {
+		margin-top: 0;
+	}
+
+	.kickoff-list,
+	.step-list,
+	.check-list {
+		margin: 0;
+		padding-left: 26px;
+	}
+
+	.step-list li,
+	.check-list li,
+	.kickoff-list li {
+		margin-bottom: 12px;
+	}
+
+	.note,
+	.tip {
+		border-radius: 16px;
+		padding: 16px 18px;
+		margin-top: 16px;
+	}
+
+	.note {
+		background: var(--warning-bg);
+		color: var(--warning-text);
+	}
+
+	.tip {
+		background: linear-gradient(90deg, #e6ffe6 0%, #d0f5e8 100%);
+		color: #176a3d;
+		border: 1.5px solid #b2e5c2;
+		box-shadow: 0 2px 12px rgba(31, 106, 61, 0.08);
+		font-weight: 500;
+		padding: 18px 22px;
+		margin: 18px 0;
+		font-size: 1.08em;
+		display: block;
+	}
+
+	.code-block {
+		background: var(--code-bg);
+		color: #f1f6fb;
+		border-radius: 16px;
+		padding: 18px;
+		overflow-x: auto;
+		font-family: Consolas, "Courier New", monospace;
+		font-size: 1rem;
+		white-space: pre-wrap;
+	}
+
+	.step-card {
+		border: 1px solid var(--border);
+		border-radius: 18px;
+		padding: 24px;
+		background: #ffffff;
+	}
+
+	.step-label {
+		display: inline-block;
+		padding: 8px 12px;
+		border-radius: 999px;
+		background: #e6efff;
+		color: var(--accent-dark);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		margin-bottom: 10px;
+	}
+
+	.screenshot-slot {
+		margin-top: 18px;
+		border: 2px dashed #9db7d2;
+		border-radius: 18px;
+		padding: 18px;
+		background: #f7fbff;
+	}
+
+	.screenshot-slot p {
+		margin: 0;
+	}
+
+	.screenshot-slot strong {
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.screenshot-link {
+		display: inline-block;
+		margin-top: 8px;
+		padding: 10px 14px;
+		border-radius: 12px;
+		background: #ffffff;
+		border: 1px solid var(--border);
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.intro-list {
+		margin: 0;
+		padding-left: 26px;
+	}
+
+	.intro-list li {
+		margin-bottom: 12px;
+	}
+
+	.footer-note {
+		font-size: 1rem;
+		color: var(--text-muted);
+		margin-top: 10px;
+	}
+
+	@media (max-width: 900px) {
+		.hero {
+			padding: 32px 24px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.page {
+			padding: 20px 14px 44px;
+		}
+
+		.panel,
+		.step-card {
+			padding: 18px;
+		}
+
+		body {
+			font-size: 18px;
+		}
+	}
+</style>
+</head>
+<body>
+	<div class="page">
+		<section class="hero">
+			<h1>Agentic ETL Command Guide</h1>
+			<p>
+			This guide walks you through using the main commands in Agentic ETL, with step-by-step instructions and screenshots for each step. Make sure authentication and configuration are complete based on the guide "Agentic_ETL_Setup_Guide.html" in the consumer bundle folder before trying to access OneDrive or Google Drive features.
+			</p>
+			<div class="hero-badges">
+			</div>
+		</section>
+
+		<div class="layout">
+			<main class="content">
+
+			<section class="panel">
+			<h2>Ways to Add Files</h2>
+			<div style="display: flex; flex-direction: column; gap: 32px; align-items: stretch;">
+				<div style="flex: 1 1 220px; min-width: 220px;">
+				<h3 style="margin-top:0;">Option 1: Upload via Chat</h3>
+				<ol class="step-list">
+					<li>Type <strong>input</strong> in the chat.</li>
+					<li>Select your file (Excel or CSV) when prompted.</li>
+					<li>Wait for upload confirmation.</li>
+				</ol>
+				   <img src="/images/inputCommand.png" alt="Input Command Screenshot" class="guide-image">
+				</div>
+				<div>
+				<h3 style="margin-top:0;">Option 2: Place in Input Folder</h3>
+				<ol class="step-list">
+					<li>Open the <strong>data/input</strong> folder in your project.</li>
+					<li>Copy or drag files directly into this folder.</li>
+				</ol>
+				   <img src="/images/MoveFilesIntoFolder.png" alt="Input Folder Screenshot" class="guide-image">
+				</div>
+				<div>
+				<h3 style="margin-top:0;">Option 3: Sync from Cloud</h3>
+				<ol class="step-list">
+					<li>Use <strong>run file sync</strong> or <strong>download from onedrive</strong> in chat.</li>
+					<li>Wait for files to appear in the input folder.</li>
+				</ol>
+				   <div class="screenshot-slot"><strong>Screenshot Placeholder:</strong> Chat showing sync command and result.</div>
+				</div>
+			</div>
+			</section>
+
+			<section class="panel">
+				<h2>Using the tool <span style="font-weight:400;">(<code>help</code>)</span></h2>
+				
+				<p>Type <strong>help</strong> in the chat to see a list of available commands and their descriptions.</p>
+				<div class = "code-block">Available commands (type the command or its number):
+
+=== MAIN WORKFLOWS ===
+1. run file processing - Detect changes in input folder & prepare files for LLM analysis
+2. run file sync - Full sync: Google Drive -> OneDrive -> project input. Requires authentication tokens for both
+3. process responses - Process pending LLM response JSON files in data/responses
+4. input - Upload a file into project input (or place files manually in data/input)
+
+=== TOOL SETUP ===
+5. authenticate onedrive - Start/continue browser-based OneDrive auth
+6. complete onedrive auth - Explicitly complete auth after browser sign-in. Saves a token to data/state, which is used for the onedrive sync
+
+=== INDIVIDUAL COMMANDS FOR TESTING ===
+7. analyze - AI analysis: Upload file + config, analyze with Ollama
+8. download from onedrive - OneDrive download to project input (requires auth)
+9. run google to onedrive - Sync files Google Drive -> OneDrive
+10. cleanup - Reset all generated state (hashes, outputs, archive, etc.) except files in input folder. For testing purposes.
+</div>
+				<p>We know that the tool provides a range of commands and complicated workflows, but we'll walk you through them step by step. Ideally, you only need the first 3 commands. We left the other commands enabled in case they help if any errors ever occur or some individual commands are needed. We found that separating the workflows into the primary 3 commands was the most straightforward approach.</p>
+				<p>Note that either the command name or the corresponding number can be used to invoke the command. We left the option up to the user's preference.</p>
+				<p>We also know the output gets messy and long at times, and we plan to address it after the main functionality is complete.</p>
+			</section>
+
+			<!-- MAIN WORKFLOWS -->
+			<section class="panel">
+				   <h2>1. Process Files <span style="font-weight:400;">(<code>run file processing</code>)</span></h2>
+				   <ol class="step-list">
+					   <li>Type <strong>run file processing</strong> in the chat and press Enter.</li>
+					   <li>Wait for the process to finish. Review results and follow any prompts for next steps.</li>
+				   </ol>
+				   <div class="code-block">run file processing</div>
+				   <p>This command is the core of the ETL process. Once your files are in the project, you’ll use this workflow to process them for analysis.</p>
+				   <ol class="step-list">
+					   <li><strong>Detecting Changes:</strong><br>
+						   The tool first scans the input folder for any new or modified files since your last run. It compares these files to archived versions and uses hashes to quickly spot changes. If no changed files are made, the command will exit.<br>
+						   <img src="/images/ChangeDetection.png" alt="Change Detection Screenshot" class="guide-image">
+					   </li>
+					   <li><strong>Selecting a Config File:</strong><br>
+						   Next, the tool checks for a configuration file in <code>data/config</code>.<br>
+						   &ndash; If no config is found, you’ll be prompted to upload one.<br>
+						   &ndash; If one config is found, it’s used automatically.<br>
+						   &ndash; If multiple configs are present, you’ll be asked to choose which to use.<br>
+						   <img src="/images/ChooseConfig.png" alt="Choose Config Screenshot" class="guide-image">
+						   <img src="/images/StartAnalysis.png" alt="Run AI Analysis Screenshot" class="guide-image">
+					   </li>
+					   <li><strong>Processing Files:</strong><br>
+						   With the config selected, the tool processes each changed input file one at a time. You’ll see how many files need processing and the current progress. For each file, you’ll be asked if you want to run AI analysis, with several options available:<br>
+						   <img src="/images/AnalysisOptions.png" alt="Run AI Analysis Screenshot" class="guide-image">
+						   <ul>
+							   <li><strong>Cancel Remaining Queue:</strong> Stop the command at any time.</li>
+							   <li><strong>Skip:</strong> Skip a file (e.g., if it’s corrupted or not needed).</li>
+							   <li><strong>Auto-run analysis on all input files:</strong> Automatically process all changed files in sequence—useful for batch jobs. You may start this at any point in the batch in the workflow, but there is currently no way to stop it once started.<br>
+								   <img src="/images/AutoRun.png" alt="Auto-run Analysis Screenshot" class="guide-image">
+							   </li>
+							   <li><strong>Yes:</strong> Start processing the current file. You’ll see a summary of changes, preview/edit the prompt, and send it to the local LLM for analysis.<br>
+								   <img src="/images/PromptPreview.png" alt="Prompt Preview Screenshot" class="guide-image">
+								   <img src="/images/Warmup.png" alt="LLM Response Screenshot" class="guide-image">
+							   </li>
+						   </ul>
+						   <span class="tip"><strong>Note:</strong> The AI “warmup” checks that the local LLM is working before main processing, improving performance and confirming the model in use. LLM responses are saved for later steps.</span>
+						   <img src="/images/AnalysisStarts.png" alt="Analysis Starts Screenshot" class="guide-image">
+					   </li>
+					   <li><strong>Finishing Up:</strong><br>
+						   After all files are processed, you’ll be prompted to continue to the “Process Responses” workflow. This is a separate step, so you can pause and return later if needed.<br>
+						   <img src="/images/AnalysisFinished.png" class="guide-image">
+					   </li>
+				   </ol>
+			</section>
+
+			<section class="panel">
+				<h2>2. Run File Sync <span style="font-weight:400;">(<code>run file sync</code>)</span></h2>
+				<p>Copies files from Google Drive to OneDrive, and from OneDrive into the data/input folder. Requires authentication for both drives (so make sure that the "authenticate one drive" command has been run before trying this, otherwise you will see an error). Note that in both cases, folders are checked recursively (meaning all files in subfolders, and subfolders of other subfolders, are checked). However, the folder structure is not maintained across the copying in either case, and all files get copied to the main directory of the next location right now (Google drive files in subfolders -> OneDrive main folder, and OneDrive files in subfolders -> data/input). The folders for both can be configured in the .env file, and for more details on that, see the guide called "Agentic_ETL_Setup_Guide.html" in the consumer-bunder folder. If you update the .env file, make sure to save it and then stop and start the app again.</p>
+				<ol class="step-list">
+					<li>Type <strong>run file sync</strong> in the chat and press Enter.</li>
+					<li>Wait for the sync to complete. Success or error messages will appear in chat.</li>
+				</ol>
+				<div class="code-block">run file sync</div>
+
+			</section>
+
+			<section class="panel">
+				<h2>3. Process Responses <span style="font-weight:400;">(<code>process responses</code>)</span></h2>
+				<p>This is the second of the file processing, and is where the LLM responses actually get used to update the Config File that was analyzed. The command processes pending all previously-saved LLM response JSON files in <strong>data/responses</strong>. The options follow a very similar structure as the "run file processing" command, and are as follows:</p>
+				<li>"continue": This is essentially a way to say "I will handle this one manually, archive it and go to the next response". It moves the response to the data/responses/archive folder, and in the future this can be swapped to automatic deleting once the process is robust enough.</li>
+				<li>"Skip": This option allows the user to skip processing a particular response. The response file will not be touched, and may be processed later in a future run of the same command.</li>
+				<li>"Cancel Remaining Queue": Escapes the current workflow and does not delete/archive any remaining responses.</li>
+				<li>"Automatically Handle": This option, which is not fully implemented as of April 6th, will allow the system to automatically update the config file based on the LLM responses. The idea is: It will show you the LLM response, propose edits and give you a preview, and allow you to accept or deny them.</li>
+				<ol class="step-list">
+					<li>Type <strong>process responses</strong> in the chat and press Enter.</li>
+					<li>Follow the prompts to handle or archive responses as needed.</li>
+				</ol>
+				<div class="code-block">process responses</div>
+				<p>Note that this command is still in development and may not be fully functional. The intention is to provide a seamless way to review and integrate LLM-generated insights into your configuration files.</p>
+
+			</section>
+
+			<section class="panel">
+				<h2>4. Upload a Single File <span style="font-weight:400;">(<code>input</code>)</span></h2>
+				<p>Edit this description: Uploads a single file (Excel or CSV) to the project input folder. <strong>This command only uploads files; you must run <code>run file processing</code> to process them. There are other options to get files ready to be processed (as explained at the top of this page).</strong></p>
+				<ol class="step-list">
+					<li>Type <strong>input</strong> in the chat and select your file.</li>
+					<li>Wait for the upload to complete.</li>
+				</ol>
+				<div class="code-block">input</div>
+
+			</section>
+
+			<section class="panel">Note that the following 2 commands are related to OneDrive integration/authentication, and need ran once as part of the tool setup process outlined in consumer-bunder/Agentic_ETL_Setup_guide.html</section>
+			<!-- TOOL SETUP -->
+			<section class="panel">
+				<h2>5. Authenticate OneDrive <span style="font-weight:400;">(<code>authenticate onedrive</code>)</span></h2>
+				<p>Edit this description: Starts or continues browser-based OneDrive authentication.</p>
+				<ol class="step-list">
+					<li>Type <strong>authenticate onedrive</strong> in the chat and press Enter.</li>
+					<li>Follow the browser prompts to sign in and complete authentication.</li>
+				</ol>
+				<div class="code-block">authenticate onedrive</div>
+
+			</section>
+
+			<section class="panel">
+				<h2>6. Complete OneDrive Auth <span style="font-weight:400;">(<code>complete onedrive auth</code>)</span></h2>
+				<p>Edit this description: Completes OneDrive authentication after browser sign-in. Saves a token to <strong>data/state</strong> for use in OneDrive sync.</p>
+				<ol class="step-list">
+					<li>Type <strong>complete onedrive auth</strong> in the chat and press Enter.</li>
+					<li>Wait for confirmation that authentication is complete.</li>
+				</ol>
+				<div class="code-block">complete onedrive auth</div>
+
+			</section>
+
+			<section class="panel">Note that the following commands are for testing individual functionalities just in case the full workflow is not working as expected for whatever reason. "analyze" is built-in to the "run file processing" command, and this is more of an individualized version of it. We are leaving it in for now in case the full automation fails, or if the user just wants to run a single specific file in the case of some corruption/error somewhere. It has not been as thoroughly tested as the main workflow commands, so be weary that errors may exist. Also, if "run file sync" fails, the individual commands may be helpful for debugging which part is causing issues. "Cleanup" is useful for testing, but it deletes ALL output data. Depending on feedback, we may implement a lighter cleanup command that clears up the archives to save on storage in the long term.</section>
+
+			<!-- INDIVIDUAL COMMANDS FOR TESTING -->
+			<section class="panel">
+				<h2>7. Analyze a File <span style="font-weight:400;">(<code>analyze</code>)</span></h2>
+				<p>Runs AI analysis on a single file and config. Useful for quick, individual file testing. For many files, use <strong>run file processing</strong> instead.</p>
+				<ol class="step-list">
+					<li>Type <strong>analyze</strong> in the chat and press Enter.</li>
+					<li>Select your input file when prompted.</li>
+					<li>Select your config file when prompted.</li>
+					<li>Wait for the analysis to complete and review the results in chat.</li>
+				</ol>
+				<div class="code-block">analyze</div>
+
+			</section>
+
+			<section class="panel">
+				<h2>8. Download from OneDrive <span style="font-weight:400;">(<code>download from onedrive</code>)</span></h2>
+				<p>Downloads files from OneDrive to the project input folder (requires authentication).</p>
+				<ol class="step-list">
+					<li>Type <strong>download from onedrive</strong> in the chat and press Enter.</li>
+					<li>Wait for the download to complete. Success or error messages will appear in chat.</li>
+				</ol>
+				<div class="code-block">download from onedrive</div>
+
+			</section>
+
+			<section class="panel">
+				<h2>9. Sync Google Drive to OneDrive <span style="font-weight:400;">(<code>run google to onedrive</code>)</span></h2>
+				<p>Syncs files from Google Drive to OneDrive (requires authentication for both).</p>
+				<ol class="step-list">
+					<li>Type <strong>run google to onedrive</strong> in the chat and press Enter.</li>
+					<li>Wait for the sync to complete. Success or error messages will appear in chat.</li>
+				</ol>
+				<div class="code-block">run google to onedrive</div>
+
+			</section>
+
+			<section class="panel">
+				<h2>10. Cleanup Project State <span style="font-weight:400;">(<code>cleanup</code>)</span></h2>
+				<p>Resets all generated state (hashes, outputs, archive, etc.) except files in the input folder. For testing purposes.</p>
+				<ol class="step-list">
+					<li>Type <strong>cleanup</strong> in the chat and press Enter.</li>
+					<li>Wait for the cleanup to complete. Success or error messages will appear in chat.</li>
+				</ol>
+				<div class="code-block">cleanup</div>
+
+			</section>
+
+			<!-- FINAL SECTION -->
+			<section class="panel">
+				<h2>When you are finished using the tool</h2>
+				<ol class="step-list">
+					<li>Go back to the <strong>consumer bundle</strong> folder.</li>
+					<li>Find <strong>stop_my_app.bat</strong>.</li>
+					<li>Double click <strong>stop_my_app.bat</strong> to stop the program.</li>
+					<li>You may also close out of Docker and Ollama to save on RAM and CPU usage if you are not planning to use the tool again soon. If you need help with this step, see the section at the bottom of Agentic_ETL_Setup_Guide.html in the consumer-bundle folder.</li>
+				</ol>
+			</section>
+			</main>
+		</div>
+	</div>
+</body>
+</html>

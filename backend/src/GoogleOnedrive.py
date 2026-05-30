@@ -11,7 +11,7 @@
 # Endpoint: POST /run/google_to_onedrive
 #
 # Required env:
-#   GOOGLE_SERVICE_ACCOUNT_FILE=/app/backend/src/riverrockadvisors-api-key.json   (or a mounted secret path)
+#   GOOGLE_SERVICE_ACCOUNT_FILE=/app/backend/src/google-service-account-key.json   (or a mounted secret path)
 #   GOOGLE_DRIVE_FOLDER_ID=<Drive folder id to scan>
 #
 # Recommended env:
@@ -93,7 +93,7 @@ GOOGLE_DRIVE_FOLDER_ID = _env("GOOGLE_DRIVE_FOLDER_ID")
 MS_CLIENT_ID = _env("MS_CLIENT_ID")
 MS_CLIENT_SECRET = _env("MS_CLIENT_SECRET")
 MS_TENANT_ID = _env("MS_TENANT_ID")
-MS_USER_EMAIL = _env("MS_USER_EMAIL", "BGSU.Capstone@riverrockadvisors.com")
+MS_USER_EMAIL = _env("MS_USER_EMAIL", "user@example.com")
 
 UPLOAD_TO_ONEDRIVE = _env("UPLOAD_TO_ONEDRIVE", "false").lower() in ("1", "true", "yes", "y")
 ONEDRIVE_REMOTE_FOLDER = _env("ONEDRIVE_REMOTE_FOLDER", "GoogleSheetsBackups")

@@ -46,7 +46,7 @@ services:
       - ./data/state:/data/state
       - ./data/archive:/data/archive
       - ./backend:/app/backend
-      - ./secrets/riverrockadvisors-api-key.json:/run/secrets/google_service_account.json:ro
+      - ./secrets/google-service-account-key.json:/run/secrets/google_service_account.json:ro
       - ${ONEDRIVE_BACKUP_DIR}:/data/GoogleSheetsBackups
     restart: unless-stopped
 

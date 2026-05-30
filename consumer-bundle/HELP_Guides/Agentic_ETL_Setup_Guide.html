@@ -370,9 +370,9 @@
                         folder into the project.</p>
                     <ol class="step-list">
                         <li>Get the Google service account JSON key file from your admin or team. This file is named
-                            <strong>riverrockadvisors-api-key.json</strong> and is specific to River Rock Advisors.</li>
+                            <strong>google-service-account-key.json</strong>.</li>
                         <li>Place the file inside the project's <strong>secrets/</strong> folder. The filename must be
-                            exactly <strong>riverrockadvisors-api-key.json</strong> — Docker mounts this file
+                            exactly <strong>google-service-account-key.json</strong> — Docker mounts this file
                             automatically when the tool starts.</li>
                         <li>Open the Google Drive folder that contains the files you want to sync. The folder ID is the
                             string of characters at the end of the URL after <strong>/folders/</strong>.
@@ -399,23 +399,23 @@
                         Desktop app is already syncing to the cloud, so that files are automatically backed up to
                         OneDrive as well.</p>
                     <ol class="step-list">
-                        <li>Make sure the <strong>OneDrive Desktop app</strong> is installed and signed in to the River
-                            Rock Advisors account on this computer.</li>
+                        <li>Make sure the <strong>OneDrive Desktop app</strong> is installed and signed in to your
+                            organization account on this computer.</li>
                         <li>Locate the synced OneDrive folder on your computer. It is typically found at one of these
                             paths:
                             <div class="code-block">Mac:
-                                /Users/your-name/Library/CloudStorage/OneDrive-RiverRockAdvisors/GoogleSheetsBackups
-                                Windows: C:\Users\your-name\OneDrive - RiverRockAdvisors\GoogleSheetsBackups</div>
+                                /Users/your-name/Library/CloudStorage/OneDrive-YourOrganization/GoogleSheetsBackups
+                                Windows: C:\Users\your-name\OneDrive - YourOrganization\GoogleSheetsBackups</div>
                             If the <strong>GoogleSheetsBackups</strong> folder does not exist yet, create it inside the
                             OneDrive folder.
                         </li>
                         <li>Open your <strong>.env</strong> file and set <strong>ONEDRIVE_BACKUP_DIR</strong> to that
                             path:
                             <div class="code-block"># Mac example:
-                                ONEDRIVE_BACKUP_DIR=/Users/your-name/Library/CloudStorage/OneDrive-RiverRockAdvisors/GoogleSheetsBackups
+                                ONEDRIVE_BACKUP_DIR=/Users/your-name/Library/CloudStorage/OneDrive-YourOrganization/GoogleSheetsBackups
 
                                 # Windows example:
-                                ONEDRIVE_BACKUP_DIR=C:\Users\your-name\OneDrive - RiverRockAdvisors\GoogleSheetsBackups
+                                ONEDRIVE_BACKUP_DIR=C:\Users\your-name\OneDrive - YourOrganization\GoogleSheetsBackups
                             </div>
                         </li>
                         <li>Confirm that the OneDrive Desktop app shows this folder as synced (not paused). When the
@@ -440,7 +440,7 @@
                         <li>Click the "New registration" button.</li>
                         <li>Name it something memorable such as "OneDrive Download for Agentic ETL"</li>
 
-                        <li>Select account type as "single tenant only - River Rock Advisors".</li>
+                        <li>Select account type as "single tenant only - your organization".</li>
 
                         <li>Leave redirect URI blank and click "register".</li>
                         <img src="../Project-Setup-Guide-Images/Register-App-Registration.png"
@@ -491,7 +491,7 @@
                             alt="Azure Authentication page with link to old experience highlighted"
                             style="max-width:100%;border-radius:10px;margin-top:12px;">
                         <li>Once you are in the old experience, first check that the dropdown box of "Supported account
-                            types" says "single tenant - River Rock Advisors", and if not then change it. </li>
+                            types" says "single tenant - your organization", and if not then change it. </li>
                         <li>Next, scroll down to the "Advanced settings" section at the bottom, and change "Allow public
                             client flows" to "Yes", and click save at the bottom. This will allow the application to
                             properly connect</li>

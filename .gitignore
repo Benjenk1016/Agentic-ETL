@@ -38,6 +38,6 @@ secrets
 .venv
 
 # Service account credentials (never commit)
-backend/src/riverrockadvisors-api-key.json
-consumer-bundle/config/riverrockadvisors-api-key.json
-secrets/riverrockadvisors-api-key.json
+backend/src/google-service-account-key.json
+consumer-bundle/config/google-service-account-key.json
+secrets/google-service-account-key.json

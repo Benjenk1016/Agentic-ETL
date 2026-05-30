@@ -32,6 +32,6 @@ services:
       - ../data/state:/data/state
       - ../data/archive:/data/archive
       - ../data/onedrive:/data/onedrive
-      - ./riverrockadvisors-api-key.json:/run/secrets/google_service_account.json:ro
+      - ./google-service-account-key.json:/run/secrets/google_service_account.json:ro
       - ${ONEDRIVE_BACKUP_DIR}:/data/GoogleSheetsBackups
     restart: unless-stopped

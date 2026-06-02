@@ -152,7 +152,3 @@ For help with specific issues, see:
 > Folders are created automatically on first run. Set `BASELINE_HISTORY_MODE=all` to keep all snapshots, or `latest` to keep only the most recent.
 
 
-## Client Contact Info
-- **Zachary Goodman**
-- **Email:** Zacharg@bgsu.edu
-- **Phone:** 440-520-9538
